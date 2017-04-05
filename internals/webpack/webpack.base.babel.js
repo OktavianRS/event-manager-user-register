@@ -13,19 +13,20 @@ module.exports = (options) => ({
   }, options.output), // Merge with env dependent settings
   module: {
     loaders: [{
-      test: /\.js$/, // Transform all .js files required somewhere with Babel
+      test: /\.(js|jsx)$/, // Transform all .js files required somewhere with Babel
       loader: 'babel-loader',
       exclude: /node_modules/,
       query: options.babelQuery,
-    }, {
-      // Do not transform vendor's CSS with CSS-modules
-      // The point is that they remain in global scope.
-      // Since we require these CSS files in our JS or CSS files,
-      // they will be a part of our compilation either way.
-      // So, no need for ExtractTextPlugin here.
+    },
+    {
       test: /\.css$/,
       include: /node_modules/,
       loaders: ['style-loader', 'css-loader'],
+    },
+    {
+      test: /\.(css|scss)$/,
+      exclude: /node_modules/,
+      loaders: ['style-loader', 'css-loader', 'sass-loader'],
     }, {
       test: /\.(eot|svg|ttf|woff|woff2)$/,
       loader: 'file-loader',
@@ -58,7 +59,18 @@ module.exports = (options) => ({
       query: {
         limit: 10000,
       },
-    }],
+    },
+    {
+      test: /\.scss$/,
+      use: [{
+        loader: 'style-loader', // creates style nodes from JS strings
+      }, {
+        loader: 'css-loader', // translates CSS into CommonJS
+      }, {
+        loader: 'sass-loader', // compiles Sass to CSS
+      }],
+    },
+    ],
   },
   plugins: options.plugins.concat([
     new webpack.ProvidePlugin({

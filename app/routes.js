@@ -34,6 +34,72 @@ export default function createRoutes(store) {
         importModules.catch(errorLoading);
       },
     }, {
+      path: '/auth',
+      name: 'auth',
+      getComponent(nextState, cb) {
+        const importModules = Promise.all([
+          import('containers/Auth/reducer'),
+          import('containers/Auth/sagas'),
+          import('containers/Auth'),
+        ]);
+
+        const renderRoute = loadModule(cb);
+
+        importModules.then(([reducer, sagas, component]) => {
+          injectReducer('auth', reducer.default);
+          injectSagas(sagas.default);
+          renderRoute(component);
+        });
+
+        importModules.catch(errorLoading);
+      },
+    }, {
+      path: '/register',
+      name: 'register',
+      getComponent(nextState, cb) {
+        const importModules = Promise.all([
+          import('containers/Register/reducer'),
+          import('containers/Register/sagas'),
+          import('containers/Register'),
+        ]);
+
+        const renderRoute = loadModule(cb);
+
+        importModules.then(([reducer, sagas, component]) => {
+          injectReducer('register', reducer.default);
+          injectSagas(sagas.default);
+          renderRoute(component);
+        });
+
+        importModules.catch(errorLoading);
+      },
+      onEnter(nextState, replace) {
+        sessionStorage.getItem('nameOfEvent') || replace({ pathname: '/loader' });
+      },
+    }, {
+      path: '/loader',
+      name: 'loader',
+      getComponent(nextState, cb) {
+        const importModules = Promise.all([
+          import('containers/Loader/reducer'),
+          import('containers/Loader/sagas'),
+          import('containers/Loader'),
+        ]);
+
+        const renderRoute = loadModule(cb);
+
+        importModules.then(([reducer, sagas, component]) => {
+          injectReducer('loader', reducer.default);
+          injectSagas(sagas.default);
+          renderRoute(component);
+        });
+
+        importModules.catch(errorLoading);
+      },
+      onEnter(nextState, replace) {
+        sessionStorage.getItem('nameOfEvent') && replace({ pathname: '/register' });
+      },
+    }, {
       path: '*',
       name: 'notfound',
       getComponent(nextState, cb) {
